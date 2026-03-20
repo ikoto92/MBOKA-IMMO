@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer"      Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore"                      Version="8.0.11" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="FluentValidation.AspNetCore"                        Version="11.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore"                             Version="6.8.1"  />
+    <PackageReference Include="BCrypt.Net-Next"                                    Version="4.0.3"  />
+    <PackageReference Include="Serilog.AspNetCore"                                 Version="8.0.3"  />
+    <PackageReference Include="SendGrid"                                           Version="9.29.3" />
+    <PackageReference Include="Azure.Storage.Blobs"                               Version="12.22.2"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MbokaImmo.Services\MbokaImmo.Services.csproj"           />
+    <ProjectReference Include="..\MbokaImmo.Infrastructure\MbokaImmo.Infrastructure.csproj" />
+    <ProjectReference Include="..\MbokaImmo.Domain\MbokaImmo.Domain.csproj"               />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>MBOKA_IMMO</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- EF Core 8 — compatible net8.0 -->
+    <PackageReference Include="DotNetEnv" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+    <!-- Auth JWT -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+    <!-- AutoMapper -->
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <!-- Validation -->
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <!-- Swagger -->
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.8.1" />
+    <!-- Password hashing -->
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <!-- Logs -->
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+    <!-- Email -->
+    <PackageReference Include="SendGrid" Version="9.29.3" />
+    <!-- Storage -->
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.22.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\MbokaImmo.API\Controllers\" />
+    <Folder Include="src\MbokaImmo.API\DTOs\Auth\" />
+    <Folder Include="src\MbokaImmo.API\DTOs\Biens\" />
+    <Folder Include="src\MbokaImmo.API\DTOs\Locations\" />
+    <Folder Include="src\MbokaImmo.API\DTOs\Interventions\" />
+    <Folder Include="src\MbokaImmo.API\DTOs\Common\" />
+    <Folder Include="src\MbokaImmo.API\DTOs\Paiements\" />
+    <Folder Include="src\MbokaImmo.API\Middleware\" />
+    <Folder Include="src\MbokaImmo.API\Extensions\" />
+    <Folder Include="src\MbokaImmo.API\Validators\" />
+    <Folder Include="src\MbokaImmo.Data\Interfaces\" />
+    <Folder Include="src\MbokaImmo.Data\Repositories\" />
+    <Folder Include="src\MbokaImmo.Domain\Entities\" />
+    <Folder Include="src\MbokaImmo.Domain\Enums\" />
+    <Folder Include="src\MbokaImmo.Infrastructure\ExternalServices\MobileMoney\" />
+    <Folder Include="src\MbokaImmo.Infrastructure\ExternalServices\Email\" />
+    <Folder Include="src\MbokaImmo.Infrastructure\ExternalServices\Storage\" />
+    <Folder Include="src\MbokaImmo.Infrastructure\Helpers\" />
+    <Folder Include="src\MbokaImmo.Services\Interfaces\" />
+    <Folder Include="src\MbokaImmo.Services\Implementations\" />
+    <Folder Include="src\MbokaImmo.Services\Mappings\" />
+    <Folder Include="src\tests\MbokaImmo.Tests.Unit\Services\" />
+    <Folder Include="src\tests\MbokaImmo.Tests.Unit\Helpers\" />
+    <Folder Include="src\tests\MbokaImmo.Tests.Integration\Controllers\" />
+  </ItemGroup>
+</Project>
