@@ -31,8 +31,6 @@
     <PackageReference Include="Azure.Storage.Blobs" Version="12.22.2" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\MbokaImmo.API\Controllers\" />
-    <Folder Include="src\MbokaImmo.API\DTOs\Auth\" />
     <Folder Include="src\MbokaImmo.API\DTOs\Biens\" />
     <Folder Include="src\MbokaImmo.API\DTOs\Locations\" />
     <Folder Include="src\MbokaImmo.API\DTOs\Interventions\" />
@@ -48,9 +46,6 @@
     <Folder Include="src\MbokaImmo.Infrastructure\ExternalServices\MobileMoney\" />
     <Folder Include="src\MbokaImmo.Infrastructure\ExternalServices\Email\" />
     <Folder Include="src\MbokaImmo.Infrastructure\ExternalServices\Storage\" />
-    <Folder Include="src\MbokaImmo.Infrastructure\Helpers\" />
-    <Folder Include="src\MbokaImmo.Services\Interfaces\" />
-    <Folder Include="src\MbokaImmo.Services\Implementations\" />
     <Folder Include="src\MbokaImmo.Services\Mappings\" />
     <Folder Include="src\tests\MbokaImmo.Tests.Unit\Services\" />
     <Folder Include="src\tests\MbokaImmo.Tests.Unit\Helpers\" />
