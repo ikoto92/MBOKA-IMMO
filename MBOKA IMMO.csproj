@@ -31,10 +31,8 @@
     <PackageReference Include="Azure.Storage.Blobs" Version="12.22.2" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\MbokaImmo.API\DTOs\Biens\" />
     <Folder Include="src\MbokaImmo.API\DTOs\Locations\" />
     <Folder Include="src\MbokaImmo.API\DTOs\Interventions\" />
-    <Folder Include="src\MbokaImmo.API\DTOs\Common\" />
     <Folder Include="src\MbokaImmo.API\DTOs\Paiements\" />
     <Folder Include="src\MbokaImmo.API\Middleware\" />
     <Folder Include="src\MbokaImmo.API\Extensions\" />
