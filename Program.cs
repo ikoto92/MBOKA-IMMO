@@ -47,12 +47,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// ── CORS
+// ── CORS - Correction de l'URL et ajout de AllowCredentials si nécessaire
 builder.Services.AddCors(options =>
     options.AddPolicy("MbokaPolicy", policy =>
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(
+                "http://localhost:5173",
+                "http://localhost:5174"  // Ajout de l'URL correcte
+              )
               .AllowAnyHeader()
               .AllowAnyMethod()
+              .AllowCredentials()  // Important si vous utilisez l'authentification
     )
 );
 
@@ -66,6 +70,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Ordre correct des middlewares
+app.UseCors("MbokaPolicy");  // ← AJOUT OBLIGATOIRE : Appliquer la politique CORS
+app.UseAuthentication();     // ← Déplacer avant UseAuthorization
 app.UseAuthorization();
+
 app.MapControllers();
 app.Run();
