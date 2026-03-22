@@ -1,4 +1,6 @@
-﻿using MBOKA_IMMO.src.MbokaImmo.Infrastructure;
+﻿using MBOKA_IMMO.src.MbokaImmo.Data.Interfaces;
+using MBOKA_IMMO.src.MbokaImmo.Data.Repositories;
+using MBOKA_IMMO.src.MbokaImmo.Infrastructure;
 using MBOKA_IMMO.src.MbokaImmo.Infrastructure.Helpers;
 using MBOKA_IMMO.src.MbokaImmo.Infrastructure.Persistence;
 using MBOKA_IMMO.src.MbokaImmo.Services.Implementations;
@@ -22,6 +24,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         "Host=localhost;Port=5432;Database=mboka_immo;Username=postgres;Password=123456"
     )
 );
+
+// ── Artisan services
+builder.Services.AddScoped<IArtisanService, ArtisanService>();
+builder.Services.AddScoped<IArtisanRepository, ArtisanRepository>();
 
 // ── Auth services
 builder.Services.AddScoped<IAuthService, AuthService>();
