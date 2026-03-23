@@ -9,10 +9,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MBOKA_IMMO.Persistence.Migrations
+namespace MBOKA_IMMO.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260319194020_InitialCreate")]
+    [Migration("20260323102825_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -173,8 +173,17 @@ namespace MBOKA_IMMO.Persistence.Migrations
                     b.Property<int>("IdLocataire")
                         .HasColumnType("integer");
 
-                    b.Property<string>("MessageCandidat")
+                    b.Property<string>("JustificatifUrl")
                         .HasColumnType("text");
+
+                    b.Property<string>("MessageMotivation")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PieceIdentiteUrl")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("RevenusMenuels")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Statut")
                         .IsRequired()

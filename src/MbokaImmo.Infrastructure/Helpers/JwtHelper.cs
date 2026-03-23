@@ -24,15 +24,33 @@ public class JwtHelper
 
     public string GenerateAccessToken(Utilisateur user)
     {
-        var claims = new[]
+        // Claims de base
+        var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub,   user.IdUser.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti,   Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role,               user.Role.ToString()),
-            new Claim("nom",                         user.Nom),
-            new Claim("prenom",                      user.Prenom),
+            new(JwtRegisteredClaimNames.Sub,   user.IdUser.ToString()),
+            new(JwtRegisteredClaimNames.Email, user.Email),
+            new(JwtRegisteredClaimNames.Jti,   Guid.NewGuid().ToString()),
+            new(ClaimTypes.Role,               user.Role.ToString()),
+            new("nom",                         user.Nom),
+            new("prenom",                      user.Prenom),
         };
+
+        // Claims spécifiques au rôle
+        if (user.Proprietaire is not null)
+            claims.Add(new Claim("proprietaireId",
+                user.Proprietaire.IdProprio.ToString()));
+
+        if (user.Locataire is not null)
+            claims.Add(new Claim("locataireId",
+                user.Locataire.IdLocataire.ToString()));
+
+        if (user.Artisan is not null)
+            claims.Add(new Claim("artisanId",
+                user.Artisan.IdArtisan.ToString()));
+
+        if (user.Agent is not null)
+            claims.Add(new Claim("agentId",
+                user.Agent.IdAgent.ToString()));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -50,4 +68,40 @@ public class JwtHelper
 
     public string GenerateRefreshToken()
         => Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");
+
+    public string GenerateEmailVerificationToken(int userId)
+    {
+        var claims = new[] { new Claim("userId", userId.ToString()) };
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: _issuer,
+            audience: _audience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(1),
+            signingCredentials: creds
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public int ValidateEmailVerificationToken(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var parameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = _issuer,
+            ValidAudience = _audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_secret))
+        };
+
+        var principal = handler.ValidateToken(token, parameters, out _);
+        return int.Parse(principal.FindFirst("userId")!.Value);
+    }
 }

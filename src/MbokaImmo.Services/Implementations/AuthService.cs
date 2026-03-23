@@ -1,4 +1,5 @@
-﻿using MBOKA_IMMO.src.MbokaImmo.API.DTOs.Auth;
+﻿
+using MBOKA_IMMO.src.MbokaImmo.API.DTOs.Auth;
 using MBOKA_IMMO.src.MbokaImmo.Domain.Entities;
 using MBOKA_IMMO.src.MbokaImmo.Domain.Enums;
 using MBOKA_IMMO.src.MbokaImmo.Infrastructure.Helpers;
@@ -31,7 +32,8 @@ public class AuthService : IAuthService
 
         // 2. Parser le rôle
         if (!Enum.TryParse<RoleEnum>(dto.Role, true, out var role))
-            throw new ArgumentException("Rôle invalide. Valeurs acceptées : Proprio, Locataire, Agent, Artisan.");
+            throw new ArgumentException(
+                "Rôle invalide. Valeurs acceptées : Proprio, Locataire, Agent, Artisan.");
 
         // 3. Créer l'utilisateur
         var utilisateur = new Utilisateur
@@ -86,20 +88,32 @@ public class AuthService : IAuthService
 
         await _context.SaveChangesAsync();
 
-        // 5. Générer les tokens
+        // 5. Recharger avec les relations pour le JWT
+        var utilisateurComplet = await _context.Utilisateurs
+            .Include(u => u.Proprietaire)
+            .Include(u => u.Locataire)
+            .Include(u => u.Artisan)
+            .Include(u => u.Agent)
+            .FirstAsync(u => u.IdUser == utilisateur.IdUser);
+
+        // 6. Générer les tokens
         return new AuthResponseDto
         {
-            AccessToken = _jwtHelper.GenerateAccessToken(utilisateur),
+            AccessToken = _jwtHelper.GenerateAccessToken(utilisateurComplet),
             RefreshToken = _jwtHelper.GenerateRefreshToken(),
-            User = MapToUserDto(utilisateur)
+            User = MapToUserDto(utilisateurComplet)
         };
     }
 
     // ── CONNEXION ────────────────────────────────────────────────
     public async Task<AuthResponseDto> LoginAsync(LoginRequestDto dto)
     {
-        // 1. Trouver l'utilisateur par email
+        // 1. Trouver l'utilisateur avec ses relations
         var utilisateur = await _context.Utilisateurs
+            .Include(u => u.Proprietaire)
+            .Include(u => u.Locataire)
+            .Include(u => u.Artisan)
+            .Include(u => u.Agent)
             .FirstOrDefaultAsync(u => u.Email == dto.Email && u.CompteActif);
 
         if (utilisateur is null)
@@ -109,7 +123,7 @@ public class AuthService : IAuthService
         if (!PasswordHelper.Verify(dto.MotDePasse, utilisateur.MotDePasse))
             throw new UnauthorizedAccessException("Email ou mot de passe incorrect.");
 
-        // 3. Générer les tokens
+        // 3. Générer les tokens avec claims complets
         return new AuthResponseDto
         {
             AccessToken = _jwtHelper.GenerateAccessToken(utilisateur),
@@ -129,3 +143,4 @@ public class AuthService : IAuthService
         KycValide = u.KycValide
     };
 }
+

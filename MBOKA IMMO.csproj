@@ -37,7 +37,6 @@
     <Folder Include="src\MbokaImmo.API\Middleware\" />
     <Folder Include="src\MbokaImmo.API\Extensions\" />
     <Folder Include="src\MbokaImmo.API\Validators\" />
-    <Folder Include="src\MbokaImmo.Data\Interfaces\" />
     <Folder Include="src\MbokaImmo.Domain\Entities\" />
     <Folder Include="src\MbokaImmo.Domain\Enums\" />
     <Folder Include="src\MbokaImmo.Infrastructure\ExternalServices\MobileMoney\" />

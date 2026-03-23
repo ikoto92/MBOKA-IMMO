@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MBOKA_IMMO.Persistence.Migrations
+namespace MBOKA_IMMO.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -170,8 +170,17 @@ namespace MBOKA_IMMO.Persistence.Migrations
                     b.Property<int>("IdLocataire")
                         .HasColumnType("integer");
 
-                    b.Property<string>("MessageCandidat")
+                    b.Property<string>("JustificatifUrl")
                         .HasColumnType("text");
+
+                    b.Property<string>("MessageMotivation")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PieceIdentiteUrl")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("RevenusMenuels")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Statut")
                         .IsRequired()

@@ -1,10 +1,7 @@
 ﻿namespace MBOKA_IMMO.src.MbokaImmo.API.DTOs.Biens;
 
-public class BienResponseDto
+public class BienCreateDto
 {
-    public int IdBien { get; set; }
-    public int IdProprietaire { get; set; }
-    public string NomProprietaire { get; set; } = string.Empty;
     public string Titre { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string Adresse { get; set; } = string.Empty;
@@ -14,11 +11,7 @@ public class BienResponseDto
     public int Surface { get; set; }
     public int Pieces { get; set; }
     public decimal LoyerMensuel { get; set; }
-    public int CautionMois { get; set; }
-    public string? Disponibilite { get; set; }
-    public string Statut { get; set; } = string.Empty;
+    public int CautionMois { get; set; } = 2;
     public string? Video { get; set; }
-    public bool Valide { get; set; }
-    public DateTime DateCreation { get; set; }
-    public List<string> Photos { get; set; } = [];
+    public DateOnly? Disponibilite { get; set; }
 }

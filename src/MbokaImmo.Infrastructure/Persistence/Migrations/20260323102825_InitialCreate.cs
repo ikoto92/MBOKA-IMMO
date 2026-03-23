@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MBOKA_IMMO.Persistence.Migrations
+namespace MBOKA_IMMO.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -273,9 +273,12 @@ namespace MBOKA_IMMO.Persistence.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     IdBien = table.Column<int>(type: "integer", nullable: false),
                     IdLocataire = table.Column<int>(type: "integer", nullable: false),
-                    DateCandidature = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    MessageMotivation = table.Column<string>(type: "text", nullable: true),
+                    RevenusMenuels = table.Column<decimal>(type: "numeric", nullable: false),
+                    PieceIdentiteUrl = table.Column<string>(type: "text", nullable: true),
+                    JustificatifUrl = table.Column<string>(type: "text", nullable: true),
                     Statut = table.Column<string>(type: "text", nullable: false),
-                    MessageCandidat = table.Column<string>(type: "text", nullable: true)
+                    DateCandidature = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
