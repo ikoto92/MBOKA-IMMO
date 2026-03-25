@@ -1,38 +1,29 @@
 ﻿using MBOKA_IMMO.src.MbokaImmo.API.DTOs.Auth;
 using MBOKA_IMMO.src.MbokaImmo.API.DTOs.Common;
 using MBOKA_IMMO.src.MbokaImmo.API.DTOs.Utilisateurs;
+using MBOKA_IMMO.src.MbokaImmo.Infrastructure.Helpers;
 using MBOKA_IMMO.src.MbokaImmo.Infrastructure.Persistence;
 using MBOKA_IMMO.src.MbokaImmo.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace MBOKA_IMMO.src.MbokaImmo.Services.Implementations;
 
-public class UtilisateurService : IUtilisateurService
+public class UtilisateurService(AppDbContext context) : IUtilisateurService
 {
-    private readonly AppDbContext _context;
-
-    public UtilisateurService(AppDbContext context)
-    {
-        _context = context;
-    }
-
-    // ── GET ALL (avec pagination, filtre rôle, recherche) ────────
+    // ── GET ALL ──────────────────────────────────────────────────
     public async Task<PagedResultDto<UtilisateurResponseDto>> GetAllAsync(
         int page, int pageSize, string? role, string? search)
     {
-        var query = _context.Utilisateurs.AsQueryable();
+        var query = context.Utilisateurs.AsQueryable();
 
-        // Filtre par rôle
         if (!string.IsNullOrEmpty(role))
             query = query.Where(u => u.Role.ToString() == role);
 
-        // Recherche par nom, prénom ou email
         if (!string.IsNullOrEmpty(search))
             query = query.Where(u =>
                 u.Nom.Contains(search) ||
                 u.Prenom.Contains(search) ||
-                u.Email.Contains(search)
-            );
+                u.Email.Contains(search));
 
         var totalCount = await query.CountAsync();
 
@@ -52,7 +43,7 @@ public class UtilisateurService : IUtilisateurService
                 Role = u.Role.ToString(),
                 KycValide = u.KycValide,
                 CompteActif = u.CompteActif,
-                DateInscription = u.DateInscription
+                DateInscription = u.DateInscription,
             })
             .ToListAsync();
 
@@ -61,16 +52,14 @@ public class UtilisateurService : IUtilisateurService
             Items = items,
             TotalCount = totalCount,
             Page = page,
-            PageSize = pageSize
+            PageSize = pageSize,
         };
     }
 
     // ── GET BY ID ────────────────────────────────────────────────
     public async Task<UtilisateurResponseDto?> GetByIdAsync(int id)
     {
-        var u = await _context.Utilisateurs
-            .FirstOrDefaultAsync(u => u.IdUser == id);
-
+        var u = await context.Utilisateurs.FirstOrDefaultAsync(u => u.IdUser == id);
         if (u is null) return null;
 
         return new UtilisateurResponseDto
@@ -85,73 +74,135 @@ public class UtilisateurService : IUtilisateurService
             Role = u.Role.ToString(),
             KycValide = u.KycValide,
             CompteActif = u.CompteActif,
-            DateInscription = u.DateInscription
+            DateInscription = u.DateInscription,
         };
     }
 
-    // ── UPDATE ───────────────────────────────────────────────────
+    // ── UPDATE (admin) ───────────────────────────────────────────
     public async Task<UtilisateurResponseDto> UpdateAsync(int id, UtilisateurUpdateDto dto)
     {
-        var utilisateur = await _context.Utilisateurs
-            .FirstOrDefaultAsync(u => u.IdUser == id)
+        var u = await context.Utilisateurs.FirstOrDefaultAsync(x => x.IdUser == id)
             ?? throw new KeyNotFoundException($"Utilisateur {id} introuvable.");
 
-        // Mise à jour uniquement des champs fournis
-        if (dto.Nom != null) utilisateur.Nom = dto.Nom;
-        if (dto.Prenom != null) utilisateur.Prenom = dto.Prenom;
-        if (dto.Telephone != null) utilisateur.Telephone = dto.Telephone;
-        if (dto.PaysResidence != null) utilisateur.PaysResidence = dto.PaysResidence;
-        if (dto.VilleResidence != null) utilisateur.VilleResidence = dto.VilleResidence;
-        if (dto.PieceIdentite != null) utilisateur.PieceIdentite = dto.PieceIdentite;
+        if (dto.Nom is not null) u.Nom = dto.Nom;
+        if (dto.Prenom is not null) u.Prenom = dto.Prenom;
+        if (dto.Telephone is not null) u.Telephone = dto.Telephone;
+        if (dto.PaysResidence is not null) u.PaysResidence = dto.PaysResidence;
+        if (dto.VilleResidence is not null) u.VilleResidence = dto.VilleResidence;
+        if (dto.PieceIdentite is not null) u.PieceIdentite = dto.PieceIdentite;
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         return new UtilisateurResponseDto
         {
-            IdUser = utilisateur.IdUser,
-            Nom = utilisateur.Nom,
-            Prenom = utilisateur.Prenom,
-            Email = utilisateur.Email,
-            Telephone = utilisateur.Telephone,
-            PaysResidence = utilisateur.PaysResidence,
-            VilleResidence = utilisateur.VilleResidence,
-            Role = utilisateur.Role.ToString(),
-            KycValide = utilisateur.KycValide,
-            CompteActif = utilisateur.CompteActif,
-            DateInscription = utilisateur.DateInscription
+            IdUser = u.IdUser,
+            Nom = u.Nom,
+            Prenom = u.Prenom,
+            Email = u.Email,
+            Telephone = u.Telephone,
+            PaysResidence = u.PaysResidence,
+            VilleResidence = u.VilleResidence,
+            Role = u.Role.ToString(),
+            KycValide = u.KycValide,
+            CompteActif = u.CompteActif,
+            DateInscription = u.DateInscription,
         };
     }
 
     // ── DELETE ───────────────────────────────────────────────────
     public async Task DeleteAsync(int id)
     {
-        var utilisateur = await _context.Utilisateurs
-            .FirstOrDefaultAsync(u => u.IdUser == id)
+        var u = await context.Utilisateurs.FirstOrDefaultAsync(x => x.IdUser == id)
             ?? throw new KeyNotFoundException($"Utilisateur {id} introuvable.");
 
-        _context.Utilisateurs.Remove(utilisateur);
-        await _context.SaveChangesAsync();
+        context.Utilisateurs.Remove(u);
+        await context.SaveChangesAsync();
     }
 
-    // ── TOGGLE COMPTE ACTIF (activer/désactiver) ─────────────────
+    // ── TOGGLE ACTIF ─────────────────────────────────────────────
     public async Task ToggleCompteActifAsync(int id)
     {
-        var utilisateur = await _context.Utilisateurs
-            .FirstOrDefaultAsync(u => u.IdUser == id)
+        var u = await context.Utilisateurs.FirstOrDefaultAsync(x => x.IdUser == id)
             ?? throw new KeyNotFoundException($"Utilisateur {id} introuvable.");
 
-        utilisateur.CompteActif = !utilisateur.CompteActif;
-        await _context.SaveChangesAsync();
+        u.CompteActif = !u.CompteActif;
+        await context.SaveChangesAsync();
     }
 
     // ── VALIDER KYC ──────────────────────────────────────────────
     public async Task ValiderKycAsync(int id)
     {
-        var utilisateur = await _context.Utilisateurs
-            .FirstOrDefaultAsync(u => u.IdUser == id)
+        var u = await context.Utilisateurs.FirstOrDefaultAsync(x => x.IdUser == id)
             ?? throw new KeyNotFoundException($"Utilisateur {id} introuvable.");
 
-        utilisateur.KycValide = true;
-        await _context.SaveChangesAsync();
+        u.KycValide = true;
+        await context.SaveChangesAsync();
     }
+
+    // ── GET PROFIL (connecté) ────────────────────────────────────
+    public async Task<UserDto> GetProfilAsync(int idUser)
+    {
+        var u = await context.Utilisateurs.FindAsync(idUser)
+            ?? throw new KeyNotFoundException("Utilisateur introuvable.");
+        return MapToUserDto(u);
+    }
+
+    // ── UPDATE PROFIL (connecté) ─────────────────────────────────
+    public async Task<UserDto> UpdateProfilAsync(int idUser, ProfilUpdateDto dto)
+    {
+        var u = await context.Utilisateurs.FindAsync(idUser)
+            ?? throw new KeyNotFoundException("Utilisateur introuvable.");
+
+        if (dto.Nom is not null) u.Nom = dto.Nom;
+        if (dto.Prenom is not null) u.Prenom = dto.Prenom;
+        if (dto.Telephone is not null) u.Telephone = dto.Telephone;
+        if (dto.PaysResidence is not null) u.PaysResidence = dto.PaysResidence;
+        if (dto.VilleResidence is not null) u.VilleResidence = dto.VilleResidence;
+
+        await context.SaveChangesAsync();
+        return MapToUserDto(u);
+    }
+
+    // ── CHANGE PASSWORD ──────────────────────────────────────────
+    public async Task ChangePasswordAsync(int idUser, ChangePasswordDto dto)
+    {
+        var u = await context.Utilisateurs.FindAsync(idUser)
+            ?? throw new KeyNotFoundException("Utilisateur introuvable.");
+
+        if (!PasswordHelper.Verify(dto.AncienMotDePasse, u.MotDePasse))
+            throw new UnauthorizedAccessException("Ancien mot de passe incorrect.");
+
+        u.MotDePasse = PasswordHelper.Hash(dto.NouveauMotDePasse);
+        await context.SaveChangesAsync();
+    }
+
+    // ── RESET PASSWORD REQUEST ───────────────────────────────────
+    public async Task ResetPasswordRequestAsync(ResetPasswordRequestDto dto)
+    {
+        var u = await context.Utilisateurs
+            .FirstOrDefaultAsync(x => x.Email == dto.Email && x.CompteActif);
+
+        if (u is null) return; // Sécurité : ne pas révéler si l'email existe
+        Console.WriteLine($"[TODO] Envoyer email reset password à : {u.Email}");
+    }
+
+    // ── RESET PASSWORD CONFIRM ───────────────────────────────────
+    public async Task ResetPasswordConfirmAsync(ResetPasswordConfirmDto dto)
+    {
+        // TODO: valider le token JWT et réinitialiser le mot de passe
+        await Task.CompletedTask;
+    }
+
+    // ── Mapper ───────────────────────────────────────────────────
+    private static UserDto MapToUserDto(
+        MBOKA_IMMO.src.MbokaImmo.Domain.Entities.Utilisateur u) => new()
+        {
+            IdUser = u.IdUser,
+            Nom = u.Nom,
+            Prenom = u.Prenom,
+            Email = u.Email,
+            Role = u.Role.ToString(),
+            KycValide = u.KycValide,
+        };
 }
+

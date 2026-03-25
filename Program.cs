@@ -39,6 +39,9 @@ builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddScoped<IUtilisateurService, UtilisateurService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ICandidatureService, CandidatureService>();
+builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<IVirementService, VirementService>();
+builder.Services.AddScoped<IUtilisateurService, UtilisateurService>();
 
 // ── Upload fichiers
 builder.Services.Configure<FormOptions>(options =>
