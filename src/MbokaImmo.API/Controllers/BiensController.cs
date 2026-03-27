@@ -103,6 +103,7 @@ public class BiensController(IBienService bienService) : ControllerBase
     // ── POST /api/v1/biens/{id}/photos ────────────────────────────
     [HttpPost("{id:int}/photos")]
     [Authorize(Roles = "Proprio")]
+    [Consumes("multipart/form-data")]
     public async Task<IActionResult> UploadPhotos(
         int id, [FromForm] List<IFormFile> photos)
     {
