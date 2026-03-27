@@ -16,19 +16,16 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Controllers + Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// ── Base de données
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
         "Host=localhost;Port=5432;Database=mboka_immo;Username=postgres;Password=123456"
     )
 );
 
-// ── Services métier
 builder.Services.AddScoped<IBienService, BienService>();
 builder.Services.AddScoped<IBienRepository, BienRepository>();
 builder.Services.AddScoped<IStorageService, LocalStorageService>();
@@ -43,7 +40,6 @@ builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IVirementService, VirementService>();
 builder.Services.AddScoped<IUtilisateurService, UtilisateurService>();
 
-// ── Upload fichiers
 builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 104857600;
@@ -53,7 +49,6 @@ builder.WebHost.ConfigureKestrel(options =>
     options.Limits.MaxRequestBodySize = 104857600;
 });
 
-// ── JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -71,7 +66,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// ── CORS
 builder.Services.AddCors(options =>
     options.AddPolicy("MbokaPolicy", policy =>
         policy
@@ -87,9 +81,8 @@ builder.Services.AddCors(options =>
     )
 );
 
-var app = builder.Build(); // ← Build() d'abord
+var app = builder.Build();
 
-// ── Seed Admin — APRÈS builder.Build()
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -107,12 +100,11 @@ using (var scope = app.Services.CreateScope())
             CompteActif = true,
             KycValide = true,
         });
-        context.SaveChanges(); // ← SaveChanges() sans await (contexte sync)
+        context.SaveChanges();
         Console.WriteLine("✅ Compte admin créé : admin@mboka.com / Admin@2026!");
     }
 }
 
-// ── Dossier uploads
 var uploadsPath = Path.Combine(
     app.Environment.WebRootPath
         ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"),
@@ -120,7 +112,6 @@ var uploadsPath = Path.Combine(
 );
 Directory.CreateDirectory(uploadsPath);
 
-// ── Pipeline — ORDRE OBLIGATOIRE
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
