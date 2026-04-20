@@ -15,7 +15,7 @@ public class BiensController(IBienService bienService) : ControllerBase
         => int.Parse(User.FindFirstValue("proprietaireId")
             ?? throw new UnauthorizedAccessException());
 
-    // ── GET /api/v1/biens ─────────────────────────────────────────
+    // ── GET /api/v1/biens
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> GetAll(
@@ -29,7 +29,7 @@ public class BiensController(IBienService bienService) : ControllerBase
         return Ok(result);
     }
 
-    // ── GET /api/v1/biens/{id} ────────────────────────────────────
+    // ── GET /api/v1/biens/{id}
     [HttpGet("{id:int}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetById(int id)
@@ -38,7 +38,7 @@ public class BiensController(IBienService bienService) : ControllerBase
         return bien is null ? NotFound() : Ok(bien);
     }
 
-    // ── GET /api/v1/biens/mes-biens ───────────────────────────────
+    // ── GET /api/v1/biens/mes-biens
     [HttpGet("mes-biens")]
     [Authorize(Roles = "Proprio")]
     public async Task<IActionResult> GetMesBiens()
@@ -54,7 +54,7 @@ public class BiensController(IBienService bienService) : ControllerBase
         }
     }
 
-    // ── POST /api/v1/biens ────────────────────────────────────────
+    // ── POST /api/v1/biens
     [HttpPost]
     [Authorize(Roles = "Proprio")]
     public async Task<IActionResult> Create([FromBody] BienCreateDto dto)
@@ -70,7 +70,7 @@ public class BiensController(IBienService bienService) : ControllerBase
         }
     }
 
-    // ── PUT /api/v1/biens/{id} ────────────────────────────────────
+    // ── PUT /api/v1/biens/{id}
     [HttpPut("{id:int}")]
     [Authorize(Roles = "Proprio")]
     public async Task<IActionResult> Update(int id, [FromBody] BienUpdateDto dto)
@@ -81,7 +81,7 @@ public class BiensController(IBienService bienService) : ControllerBase
             return Ok(result);
         }
         catch (KeyNotFoundException ex) { return NotFound(new { error = ex.Message }); }
-        catch (UnauthorizedAccessException ex) { return Forbid(); }
+        catch (UnauthorizedAccessException) { return Forbid(); }  // ← ex supprimé
         catch (ArgumentException ex) { return BadRequest(new { error = ex.Message }); }
     }
 
@@ -96,11 +96,11 @@ public class BiensController(IBienService bienService) : ControllerBase
             return NoContent();
         }
         catch (KeyNotFoundException ex) { return NotFound(new { error = ex.Message }); }
-        catch (UnauthorizedAccessException ex) { return Forbid(); }
+        catch (UnauthorizedAccessException) { return Forbid(); }
         catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
     }
 
-    // ── POST /api/v1/biens/{id}/photos ────────────────────────────
+    // ── POST /api/v1/biens/{id}/photos
     [HttpPost("{id:int}/photos")]
     [Authorize(Roles = "Proprio")]
     [Consumes("multipart/form-data")]
@@ -113,11 +113,11 @@ public class BiensController(IBienService bienService) : ControllerBase
             return Ok(new { urls });
         }
         catch (KeyNotFoundException ex) { return NotFound(new { error = ex.Message }); }
-        catch (UnauthorizedAccessException ex) { return Forbid(); }
+        catch (UnauthorizedAccessException) { return Forbid(); }
         catch (ArgumentException ex) { return BadRequest(new { error = ex.Message }); }
     }
 
-    // ── PUT /api/v1/biens/{id}/valider ────────────────────────────
+    // ── PUT /api/v1/biens/{id}/valider
     [HttpPut("{id:int}/valider")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Valider(int id)
@@ -133,3 +133,4 @@ public class BiensController(IBienService bienService) : ControllerBase
         }
     }
 }
+

@@ -10,6 +10,7 @@ using MBOKA_IMMO.src.MbokaImmo.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -50,12 +51,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// ── Base de données
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(
-        "Host=localhost;Port=5432;Database=mboka_immo;Username=postgres;Password=123456"
-    )
-);
 
 // ── Services métier
 builder.Services.AddScoped<IBienService, BienService>();
@@ -80,6 +75,10 @@ builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 104857600;
 });
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
 // ── JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

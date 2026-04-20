@@ -19,7 +19,7 @@ public class JwtHelper
         _secret = config["Jwt:Secret"]!;
         _issuer = config["Jwt:Issuer"]!;
         _audience = config["Jwt:Audience"]!;
-        _expiryMinutes = int.Parse(config["Jwt:ExpiryMinutes"] ?? "60");
+        _expiryMinutes = int.Parse(config["Jwt:ExpiryMinutes"] ?? "15");
     }
 
     public string GenerateAccessToken(Utilisateur user)

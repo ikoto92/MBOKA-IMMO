@@ -24,6 +24,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Conversation> Conversations { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -47,6 +48,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Conversation>().HasKey(c => c.IdConversation);
         modelBuilder.Entity<Message>().HasKey(m => m.IdMessage);
         modelBuilder.Entity<Notification>().HasKey(n => n.IdNotification);
+        modelBuilder.Entity<RefreshToken>().HasKey(r => r.IdRefreshToken);
 
         // ── Relations ─────────────────────────────────────────────
 
@@ -219,6 +221,17 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithMany(u => u.Notifications)
             .HasForeignKey(n => n.IdUser)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // RefreshToken → Utilisateur
+        modelBuilder.Entity<RefreshToken>()
+            .HasOne(r => r.Utilisateur)
+            .WithMany()
+            .HasForeignKey(r => r.IdUser)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<RefreshToken>()
+            .HasIndex(r => r.Token)
+            .IsUnique();
 
         // Enums stockés en string
         modelBuilder.Entity<Utilisateur>()

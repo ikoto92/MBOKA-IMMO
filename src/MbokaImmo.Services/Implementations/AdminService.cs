@@ -1,4 +1,5 @@
-﻿using MBOKA_IMMO.src.MbokaImmo.API.DTOs.Admin;
+﻿
+using MBOKA_IMMO.src.MbokaImmo.API.DTOs.Admin;
 using MBOKA_IMMO.src.MbokaImmo.API.DTOs.Biens;
 using MBOKA_IMMO.src.MbokaImmo.Domain.Enums;
 using MBOKA_IMMO.src.MbokaImmo.Infrastructure.Persistence;
@@ -12,7 +13,7 @@ public class AdminService(AppDbContext context) : IAdminService
     // ── Statistiques ─────────────────────────────────────────────
     public async Task<StatistiquesDto> GetStatistiquesAsync()
     {
-        var stats = new StatistiquesDto
+        return new StatistiquesDto
         {
             TotalUtilisateurs = await context.Utilisateurs.CountAsync(),
             TotalProprietaires = await context.Proprietaires.CountAsync(),
@@ -35,7 +36,6 @@ public class AdminService(AppDbContext context) : IAdminService
             InterventionsEnCours = await context.Interventions
                 .CountAsync(i => i.Statut != StatutInterventionEnum.Facture),
         };
-        return stats;
     }
 
     // ── Biens en attente de validation ───────────────────────────
@@ -103,17 +103,17 @@ public class AdminService(AppDbContext context) : IAdminService
         return artisans.Select(a => new ArtisanAdminResponseDto
         {
             IdArtisan = a.IdArtisan,
-            Nom = a.Utilisateur.Nom,
-            Prenom = a.Utilisateur.Prenom,
-            Email = a.Utilisateur.Email,
-            Telephone = a.Utilisateur.Telephone,
+            Nom = a.Utilisateur?.Nom ?? string.Empty,  // ← ?.
+            Prenom = a.Utilisateur?.Prenom ?? string.Empty,  // ← ?.
+            Email = a.Utilisateur?.Email ?? string.Empty,  // ← ?.
+            Telephone = a.Utilisateur?.Telephone,
             Specialite = a.Specialite,
             ZoneIntervention = a.ZoneIntervention,
             NoteMoyenne = a.NoteMoyenne,
             NbInterventions = a.NbInterventions,
             Disponible = a.Disponible,
-            KycValide = a.Utilisateur.KycValide,
-            DateInscription = a.Utilisateur.DateInscription,
+            KycValide = a.Utilisateur?.KycValide ?? false,          // ← ?.
+            DateInscription = a.Utilisateur?.DateInscription ?? DateTime.UtcNow, // ← ?.
         }).ToList();
     }
 
@@ -131,17 +131,17 @@ public class AdminService(AppDbContext context) : IAdminService
         return new ArtisanAdminResponseDto
         {
             IdArtisan = artisan.IdArtisan,
-            Nom = artisan.Utilisateur.Nom,
-            Prenom = artisan.Utilisateur.Prenom,
-            Email = artisan.Utilisateur.Email,
-            Telephone = artisan.Utilisateur.Telephone,
+            Nom = artisan.Utilisateur?.Nom ?? string.Empty,
+            Prenom = artisan.Utilisateur?.Prenom ?? string.Empty,
+            Email = artisan.Utilisateur?.Email ?? string.Empty,
+            Telephone = artisan.Utilisateur?.Telephone,
             Specialite = artisan.Specialite,
             ZoneIntervention = artisan.ZoneIntervention,
             NoteMoyenne = artisan.NoteMoyenne,
             NbInterventions = artisan.NbInterventions,
             Disponible = artisan.Disponible,
-            KycValide = artisan.Utilisateur.KycValide,
-            DateInscription = artisan.Utilisateur.DateInscription,
+            KycValide = artisan.Utilisateur?.KycValide ?? false,
+            DateInscription = artisan.Utilisateur?.DateInscription ?? DateTime.UtcNow,
         };
     }
 
@@ -167,19 +167,16 @@ public class AdminService(AppDbContext context) : IAdminService
             .FirstOrDefaultAsync(i => i.IdIntervention == idIntervention)
             ?? throw new KeyNotFoundException("Intervention introuvable.");
 
-        var artisan = await context.Artisans
+        _ = await context.Artisans
             .FirstOrDefaultAsync(a => a.IdArtisan == idArtisan)
             ?? throw new KeyNotFoundException("Artisan introuvable.");
 
         intervention.IdArtisan = idArtisan;
         await context.SaveChangesAsync();
 
-        // Rechargement pour la navigation
-        await context.Entry(intervention)
-            .Reference(i => i.Artisan).LoadAsync();
+        await context.Entry(intervention).Reference(i => i.Artisan).LoadAsync();
         if (intervention.Artisan is not null)
-            await context.Entry(intervention.Artisan)
-                .Reference(a => a.Utilisateur).LoadAsync();
+            await context.Entry(intervention.Artisan).Reference(a => a.Utilisateur).LoadAsync();
 
         return MapToInterventionAdminDto(intervention);
     }

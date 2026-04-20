@@ -13,6 +13,7 @@ public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
     private readonly JwtHelper _jwtHelper;
+    private const int RefreshTokenJours = 7;
 
     public AuthService(AppDbContext context, JwtHelper jwtHelper)
     {
@@ -20,22 +21,33 @@ public class AuthService : IAuthService
         _jwtHelper = jwtHelper;
     }
 
-    // ── INSCRIPTION ──────────────────────────────────────────────
-    public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto dto)
+    private async Task<string> CreerRefreshTokenAsync(int idUser)
     {
-        // 1. Vérifier si l'email existe déjà
+        var refreshToken = new RefreshToken
+        {
+            Token = _jwtHelper.GenerateRefreshToken(),
+            IdUser = idUser,
+            DateExpiration = DateTime.UtcNow.AddDays(RefreshTokenJours),
+        };
+
+        _context.RefreshTokens.Add(refreshToken);
+        await _context.SaveChangesAsync();
+
+        return refreshToken.Token;
+    }
+
+    public async Task<(AuthResponseDto Response, string RefreshToken)> RegisterAsync(RegisterRequestDto dto)
+    {
         var emailExiste = await _context.Utilisateurs
             .AnyAsync(u => u.Email == dto.Email);
 
         if (emailExiste)
             throw new InvalidOperationException("Cet email est déjà utilisé.");
 
-        // 2. Parser le rôle
         if (!Enum.TryParse<RoleEnum>(dto.Role, true, out var role))
             throw new ArgumentException(
                 "Rôle invalide. Valeurs acceptées : Proprio, Locataire, Agent, Artisan.");
 
-        // 3. Créer l'utilisateur
         var utilisateur = new Utilisateur
         {
             Nom = dto.Nom,
@@ -53,7 +65,6 @@ public class AuthService : IAuthService
 
         _context.Utilisateurs.Add(utilisateur);
 
-        // 4. Créer le profil selon le rôle
         switch (role)
         {
             case RoleEnum.Proprio:
@@ -88,7 +99,6 @@ public class AuthService : IAuthService
 
         await _context.SaveChangesAsync();
 
-        // 5. Recharger avec les relations pour le JWT
         var utilisateurComplet = await _context.Utilisateurs
             .Include(u => u.Proprietaire)
             .Include(u => u.Locataire)
@@ -96,19 +106,19 @@ public class AuthService : IAuthService
             .Include(u => u.Agent)
             .FirstAsync(u => u.IdUser == utilisateur.IdUser);
 
-        // 6. Générer les tokens
-        return new AuthResponseDto
+        var refreshToken = await CreerRefreshTokenAsync(utilisateurComplet.IdUser);
+        var response = new AuthResponseDto
         {
             AccessToken = _jwtHelper.GenerateAccessToken(utilisateurComplet),
-            RefreshToken = _jwtHelper.GenerateRefreshToken(),
             User = MapToUserDto(utilisateurComplet)
         };
+
+        return (response, refreshToken);
     }
 
-    // ── CONNEXION ────────────────────────────────────────────────
-    public async Task<AuthResponseDto> LoginAsync(LoginRequestDto dto)
+    public async Task<(AuthResponseDto Response, string RefreshToken)> LoginAsync(LoginRequestDto dto)
     {
-        // 1. Trouver l'utilisateur avec ses relations
+       
         var utilisateur = await _context.Utilisateurs
             .Include(u => u.Proprietaire)
             .Include(u => u.Locataire)
@@ -119,20 +129,56 @@ public class AuthService : IAuthService
         if (utilisateur is null)
             throw new UnauthorizedAccessException("Email ou mot de passe incorrect.");
 
-        // 2. Vérifier le mot de passe
         if (!PasswordHelper.Verify(dto.MotDePasse, utilisateur.MotDePasse))
             throw new UnauthorizedAccessException("Email ou mot de passe incorrect.");
 
-        // 3. Générer les tokens avec claims complets
-        return new AuthResponseDto
+        var refreshToken = await CreerRefreshTokenAsync(utilisateur.IdUser);
+        var response = new AuthResponseDto
         {
             AccessToken = _jwtHelper.GenerateAccessToken(utilisateur),
-            RefreshToken = _jwtHelper.GenerateRefreshToken(),
             User = MapToUserDto(utilisateur)
         };
+
+        return (response, refreshToken);
     }
 
-    // ── Mapper ───────────────────────────────────────────────────
+    public async Task<(AuthResponseDto Response, string RefreshToken)> RefreshAsync(string refreshToken)
+    {
+        var token = await _context.RefreshTokens
+            .Include(r => r.Utilisateur).ThenInclude(u => u.Proprietaire)
+            .Include(r => r.Utilisateur).ThenInclude(u => u.Locataire)
+            .Include(r => r.Utilisateur).ThenInclude(u => u.Artisan)
+            .Include(r => r.Utilisateur).ThenInclude(u => u.Agent)
+            .FirstOrDefaultAsync(r => r.Token == refreshToken);
+
+        if (token is null || !token.EstActif)
+            throw new UnauthorizedAccessException("Refresh token invalide ou expiré.");
+
+        token.DateRevocation = DateTime.UtcNow;
+        var nouveauRefreshToken = await CreerRefreshTokenAsync(token.IdUser);
+        await _context.SaveChangesAsync();
+
+        var response = new AuthResponseDto
+        {
+            AccessToken = _jwtHelper.GenerateAccessToken(token.Utilisateur),
+            User = MapToUserDto(token.Utilisateur)
+        };
+
+        return (response, nouveauRefreshToken);
+    }
+
+    public async Task LogoutAsync(string refreshToken)
+    {
+        var token = await _context.RefreshTokens
+            .FirstOrDefaultAsync(r => r.Token == refreshToken);
+
+        if (token is not null && token.DateRevocation is null)
+        {
+            token.DateRevocation = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
+    }
+
     private static UserDto MapToUserDto(Utilisateur u) => new()
     {
         IdUser = u.IdUser,
