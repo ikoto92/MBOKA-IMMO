@@ -33,6 +33,7 @@ builder.Services.AddSwaggerGen(options =>
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
         Description = "Entrez : Bearer {token}",
     });
+
     options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {
@@ -64,7 +65,7 @@ builder.Services.AddScoped<IArtisanService, ArtisanService>();
 builder.Services.AddScoped<IArtisanRepository, ArtisanRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<JwtHelper>();
-builder.Services.AddScoped<IUtilisateurService, UtilisateurService>(); // ← une seule fois
+builder.Services.AddScoped<IUtilisateurService, UtilisateurService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ICandidatureService, CandidatureService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
