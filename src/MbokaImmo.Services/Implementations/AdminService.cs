@@ -10,7 +10,6 @@ namespace MBOKA_IMMO.src.MbokaImmo.Services.Implementations;
 
 public class AdminService(AppDbContext context) : IAdminService
 {
-    // ── Statistiques ─────────────────────────────────────────────
     public async Task<StatistiquesDto> GetStatistiquesAsync()
     {
         return new StatistiquesDto
@@ -38,7 +37,6 @@ public class AdminService(AppDbContext context) : IAdminService
         };
     }
 
-    // ── Biens en attente de validation ───────────────────────────
     public async Task<List<BienAdminResponseDto>> GetBiensEnAttenteAsync()
     {
         var biens = await context.Biens
@@ -51,7 +49,6 @@ public class AdminService(AppDbContext context) : IAdminService
         return biens.Select(MapToBienAdminDto).ToList();
     }
 
-    // ── Tous les biens ────────────────────────────────────────────
     public async Task<List<BienAdminResponseDto>> GetAllBiensAsync()
     {
         var biens = await context.Biens
@@ -63,7 +60,6 @@ public class AdminService(AppDbContext context) : IAdminService
         return biens.Select(MapToBienAdminDto).ToList();
     }
 
-    // ── Valider un bien ──────────────────────────────────────────
     public async Task<BienResponseDto> ValiderBienAsync(int idBien)
     {
         var bien = await context.Biens
@@ -77,7 +73,6 @@ public class AdminService(AppDbContext context) : IAdminService
         return MapToBienResponseDto(bien);
     }
 
-    // ── Refuser un bien ──────────────────────────────────────────
     public async Task<BienResponseDto> RefuserBienAsync(int idBien)
     {
         var bien = await context.Biens
@@ -92,7 +87,6 @@ public class AdminService(AppDbContext context) : IAdminService
         return MapToBienResponseDto(bien);
     }
 
-    // ── Tous les artisans ─────────────────────────────────────────
     public async Task<List<ArtisanAdminResponseDto>> GetAllArtisansAsync()
     {
         var artisans = await context.Artisans
@@ -103,21 +97,20 @@ public class AdminService(AppDbContext context) : IAdminService
         return artisans.Select(a => new ArtisanAdminResponseDto
         {
             IdArtisan = a.IdArtisan,
-            Nom = a.Utilisateur?.Nom ?? string.Empty,  // ← ?.
-            Prenom = a.Utilisateur?.Prenom ?? string.Empty,  // ← ?.
-            Email = a.Utilisateur?.Email ?? string.Empty,  // ← ?.
+            Nom = a.Utilisateur?.Nom ?? string.Empty,  
+            Prenom = a.Utilisateur?.Prenom ?? string.Empty,  
+            Email = a.Utilisateur?.Email ?? string.Empty, 
             Telephone = a.Utilisateur?.Telephone,
             Specialite = a.Specialite,
             ZoneIntervention = a.ZoneIntervention,
             NoteMoyenne = a.NoteMoyenne,
             NbInterventions = a.NbInterventions,
             Disponible = a.Disponible,
-            KycValide = a.Utilisateur?.KycValide ?? false,          // ← ?.
-            DateInscription = a.Utilisateur?.DateInscription ?? DateTime.UtcNow, // ← ?.
+            KycValide = a.Utilisateur?.KycValide ?? false,          
+            DateInscription = a.Utilisateur?.DateInscription ?? DateTime.UtcNow, 
         }).ToList();
     }
 
-    // ── Valider KYC artisan ───────────────────────────────────────
     public async Task<ArtisanAdminResponseDto> ValiderArtisanKycAsync(int idArtisan)
     {
         var artisan = await context.Artisans
@@ -145,7 +138,6 @@ public class AdminService(AppDbContext context) : IAdminService
         };
     }
 
-    // ── Toutes les interventions ──────────────────────────────────
     public async Task<List<InterventionAdminResponseDto>> GetAllInterventionsAsync()
     {
         var interventions = await context.Interventions
@@ -157,7 +149,6 @@ public class AdminService(AppDbContext context) : IAdminService
         return interventions.Select(MapToInterventionAdminDto).ToList();
     }
 
-    // ── Assigner un artisan à une intervention ────────────────────
     public async Task<InterventionAdminResponseDto> AssignerArtisanAsync(
         int idIntervention, int idArtisan)
     {
@@ -181,7 +172,6 @@ public class AdminService(AppDbContext context) : IAdminService
         return MapToInterventionAdminDto(intervention);
     }
 
-    // ── Valider / Refuser un devis ────────────────────────────────
     public async Task<InterventionAdminResponseDto> ValiderDevisAsync(
         int idIntervention, bool valide)
     {
@@ -199,7 +189,6 @@ public class AdminService(AppDbContext context) : IAdminService
         return MapToInterventionAdminDto(intervention);
     }
 
-    // ── Mappers ───────────────────────────────────────────────────
     private static BienAdminResponseDto MapToBienAdminDto(
         MBOKA_IMMO.src.MbokaImmo.Domain.Entities.Bien b) => new()
         {

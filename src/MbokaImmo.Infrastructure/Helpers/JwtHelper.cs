@@ -24,7 +24,6 @@ public class JwtHelper
 
     public string GenerateAccessToken(Utilisateur user)
     {
-        // Claims de base
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub,   user.IdUser.ToString()),
@@ -35,7 +34,6 @@ public class JwtHelper
             new("prenom",                      user.Prenom),
         };
 
-        // Claims spécifiques au rôle
         if (user.Proprietaire is not null)
             claims.Add(new Claim("proprietaireId",
                 user.Proprietaire.IdProprio.ToString()));

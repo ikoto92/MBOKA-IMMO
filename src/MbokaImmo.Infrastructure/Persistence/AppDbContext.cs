@@ -28,7 +28,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // ── Clés primaires ────────────────────────────────────────
         modelBuilder.Entity<Utilisateur>().HasKey(u => u.IdUser);
         modelBuilder.Entity<Proprietaire>().HasKey(p => p.IdProprio);
         modelBuilder.Entity<Locataire>().HasKey(l => l.IdLocataire);
@@ -50,9 +49,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Notification>().HasKey(n => n.IdNotification);
         modelBuilder.Entity<RefreshToken>().HasKey(r => r.IdRefreshToken);
 
-        // ── Relations ─────────────────────────────────────────────
 
-        // Utilisateur → spécialisations (1-1)
         modelBuilder.Entity<Proprietaire>()
             .HasOne(p => p.Utilisateur)
             .WithOne(u => u.Proprietaire)
@@ -77,14 +74,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasForeignKey<Artisan>(a => a.IdUser)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Bien → Proprietaire
         modelBuilder.Entity<Bien>()
             .HasOne(b => b.Proprietaire)
             .WithMany(p => p.Biens)
             .HasForeignKey(b => b.IdProprietaire)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Location → Bien + Locataire
         modelBuilder.Entity<Location>()
             .HasOne(l => l.Bien)
             .WithMany(b => b.Locations)
@@ -97,7 +92,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasForeignKey(l => l.IdLocataire)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Candidature → Bien + Locataire
         modelBuilder.Entity<Candidature>()
             .HasOne(c => c.Bien)
             .WithMany(b => b.Candidatures)
@@ -110,7 +104,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasForeignKey(c => c.IdLocataire)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Visite → Bien + Agent + Locataire
         modelBuilder.Entity<Visite>()
             .HasOne(v => v.Bien)
             .WithMany(b => b.Visites)
@@ -129,7 +122,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasForeignKey(v => v.IdLocataire)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Favori → Utilisateur + Bien
         modelBuilder.Entity<Favori>()
             .HasOne(f => f.Utilisateur)
             .WithMany(u => u.Favoris)
@@ -142,21 +134,18 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasForeignKey(f => f.IdBien)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Paiement → Location
         modelBuilder.Entity<Paiement>()
             .HasOne(p => p.Location)
             .WithMany(l => l.Paiements)
             .HasForeignKey(p => p.IdLocation)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // PaiementLoyer → Paiement (1-1)
         modelBuilder.Entity<PaiementLoyer>()
             .HasOne(pl => pl.Paiement)
             .WithOne(p => p.PaiementLoyer)
             .HasForeignKey<PaiementLoyer>(pl => pl.IdPaiement)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // PaiementIntervention → Paiement (1-1) + Artisan
         modelBuilder.Entity<PaiementIntervention>()
             .HasOne(pi => pi.Paiement)
             .WithOne(p => p.PaiementIntervention)
@@ -169,14 +158,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasForeignKey(pi => pi.IdArtisan)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Virement → Proprietaire
         modelBuilder.Entity<Virement>()
             .HasOne(v => v.Proprietaire)
             .WithMany(p => p.Virements)
             .HasForeignKey(v => v.IdProprio)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Intervention → Location + Artisan
         modelBuilder.Entity<Intervention>()
             .HasOne(i => i.Location)
             .WithMany(l => l.Interventions)
@@ -189,7 +176,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasForeignKey(i => i.IdArtisan)
             .OnDelete(DeleteBehavior.SetNull);
 
-        // Conversation → Participant1 + Participant2
         modelBuilder.Entity<Conversation>()
             .HasOne(c => c.Participant1)
             .WithMany(u => u.Conversations1)
@@ -202,7 +188,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasForeignKey(c => c.Participant2Id)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Message → Conversation + Expediteur
         modelBuilder.Entity<Message>()
             .HasOne(m => m.Conversation)
             .WithMany(c => c.Messages)
@@ -215,14 +200,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasForeignKey(m => m.ExpediteurId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Notification → Utilisateur
         modelBuilder.Entity<Notification>()
             .HasOne(n => n.Utilisateur)
             .WithMany(u => u.Notifications)
             .HasForeignKey(n => n.IdUser)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // RefreshToken → Utilisateur
         modelBuilder.Entity<RefreshToken>()
             .HasOne(r => r.Utilisateur)
             .WithMany()
@@ -233,7 +216,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasIndex(r => r.Token)
             .IsUnique();
 
-        // Enums stockés en string
         modelBuilder.Entity<Utilisateur>()
             .Property(u => u.Role).HasConversion<string>();
         modelBuilder.Entity<Bien>()

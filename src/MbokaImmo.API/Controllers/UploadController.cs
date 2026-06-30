@@ -7,7 +7,7 @@ namespace MBOKA_IMMO.src.MbokaImmo.API.Controllers;
 [ApiController]
 [Route("api/v1/upload")]
 [Authorize]
-[ApiExplorerSettings(IgnoreApi = true)] // ← cache tout le controller à Swagger
+[ApiExplorerSettings(IgnoreApi = true)]
 public class UploadController(IStorageService storage) : ControllerBase
 {
     [HttpPost]

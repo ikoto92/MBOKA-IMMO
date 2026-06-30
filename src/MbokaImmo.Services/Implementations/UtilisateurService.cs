@@ -10,7 +10,6 @@ namespace MBOKA_IMMO.src.MbokaImmo.Services.Implementations;
 
 public class UtilisateurService(AppDbContext context) : IUtilisateurService
 {
-    // ── GET ALL ──────────────────────────────────────────────────
     public async Task<PagedResultDto<UtilisateurResponseDto>> GetAllAsync(
         int page, int pageSize, string? role, string? search)
     {
@@ -56,7 +55,6 @@ public class UtilisateurService(AppDbContext context) : IUtilisateurService
         };
     }
 
-    // ── GET BY ID ────────────────────────────────────────────────
     public async Task<UtilisateurResponseDto?> GetByIdAsync(int id)
     {
         var u = await context.Utilisateurs.FirstOrDefaultAsync(u => u.IdUser == id);
@@ -78,7 +76,6 @@ public class UtilisateurService(AppDbContext context) : IUtilisateurService
         };
     }
 
-    // ── UPDATE (admin) ───────────────────────────────────────────
     public async Task<UtilisateurResponseDto> UpdateAsync(int id, UtilisateurUpdateDto dto)
     {
         var u = await context.Utilisateurs.FirstOrDefaultAsync(x => x.IdUser == id)
@@ -109,7 +106,6 @@ public class UtilisateurService(AppDbContext context) : IUtilisateurService
         };
     }
 
-    // ── DELETE ───────────────────────────────────────────────────
     public async Task DeleteAsync(int id)
     {
         var u = await context.Utilisateurs.FirstOrDefaultAsync(x => x.IdUser == id)
@@ -119,7 +115,6 @@ public class UtilisateurService(AppDbContext context) : IUtilisateurService
         await context.SaveChangesAsync();
     }
 
-    // ── TOGGLE ACTIF ─────────────────────────────────────────────
     public async Task ToggleCompteActifAsync(int id)
     {
         var u = await context.Utilisateurs.FirstOrDefaultAsync(x => x.IdUser == id)
@@ -129,7 +124,6 @@ public class UtilisateurService(AppDbContext context) : IUtilisateurService
         await context.SaveChangesAsync();
     }
 
-    // ── VALIDER KYC ──────────────────────────────────────────────
     public async Task ValiderKycAsync(int id)
     {
         var u = await context.Utilisateurs.FirstOrDefaultAsync(x => x.IdUser == id)
@@ -139,7 +133,6 @@ public class UtilisateurService(AppDbContext context) : IUtilisateurService
         await context.SaveChangesAsync();
     }
 
-    // ── GET PROFIL (connecté) ────────────────────────────────────
     public async Task<UserDto> GetProfilAsync(int idUser)
     {
         var u = await context.Utilisateurs.FindAsync(idUser)
@@ -147,7 +140,6 @@ public class UtilisateurService(AppDbContext context) : IUtilisateurService
         return MapToUserDto(u);
     }
 
-    // ── UPDATE PROFIL (connecté) ─────────────────────────────────
     public async Task<UserDto> UpdateProfilAsync(int idUser, ProfilUpdateDto dto)
     {
         var u = await context.Utilisateurs.FindAsync(idUser)
@@ -163,7 +155,6 @@ public class UtilisateurService(AppDbContext context) : IUtilisateurService
         return MapToUserDto(u);
     }
 
-    // ── CHANGE PASSWORD ──────────────────────────────────────────
     public async Task ChangePasswordAsync(int idUser, ChangePasswordDto dto)
     {
         var u = await context.Utilisateurs.FindAsync(idUser)
@@ -176,7 +167,6 @@ public class UtilisateurService(AppDbContext context) : IUtilisateurService
         await context.SaveChangesAsync();
     }
 
-    // ── RESET PASSWORD REQUEST ───────────────────────────────────
     public async Task ResetPasswordRequestAsync(ResetPasswordRequestDto dto)
     {
         var u = await context.Utilisateurs
@@ -186,14 +176,11 @@ public class UtilisateurService(AppDbContext context) : IUtilisateurService
         Console.WriteLine($"[TODO] Envoyer email reset password à : {u.Email}");
     }
 
-    // ── RESET PASSWORD CONFIRM ───────────────────────────────────
     public async Task ResetPasswordConfirmAsync(ResetPasswordConfirmDto dto)
     {
-        // TODO: valider le token JWT et réinitialiser le mot de passe
         await Task.CompletedTask;
     }
 
-    // ── Mapper ───────────────────────────────────────────────────
     private static UserDto MapToUserDto(
         MBOKA_IMMO.src.MbokaImmo.Domain.Entities.Utilisateur u) => new()
         {

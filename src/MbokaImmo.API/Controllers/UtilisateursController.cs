@@ -14,18 +14,13 @@ namespace MBOKA_IMMO.src.MbokaImmo.API.Controllers;
 [Produces("application/json")]
 public class UtilisateursController(IUtilisateurService utilisateurService) : ControllerBase
 {
-    // ── Helper ───────────────────────────────────────────────────
+    
     private int GetUserId()
         => int.Parse(
             User.FindFirst(ClaimTypes.NameIdentifier)?.Value
             ?? throw new UnauthorizedAccessException("Utilisateur non authentifié.")
         );
 
-    // ════════════════════════════════════════════════════════════
-    //  ENDPOINTS ADMIN
-    // ════════════════════════════════════════════════════════════
-
-    /// <summary>Lister tous les utilisateurs (paginé)</summary>
     [HttpGet]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAll(
@@ -38,7 +33,7 @@ public class UtilisateursController(IUtilisateurService utilisateurService) : Co
         return Ok(result);
     }
 
-    /// <summary>Voir un utilisateur par ID</summary>
+   
     [HttpGet("{id:int}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetById(int id)
@@ -49,7 +44,7 @@ public class UtilisateursController(IUtilisateurService utilisateurService) : Co
             : Ok(result);
     }
 
-    /// <summary>Modifier un utilisateur (admin)</summary>
+  
     [HttpPut("{id:int}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(int id, [FromBody] UtilisateurUpdateDto dto)
@@ -65,7 +60,6 @@ public class UtilisateursController(IUtilisateurService utilisateurService) : Co
         }
     }
 
-    /// <summary>Supprimer un utilisateur</summary>
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
@@ -81,7 +75,6 @@ public class UtilisateursController(IUtilisateurService utilisateurService) : Co
         }
     }
 
-    /// <summary>Activer / Désactiver un compte</summary>
     [HttpPatch("{id:int}/toggle-actif")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> ToggleActif(int id)
@@ -97,7 +90,6 @@ public class UtilisateursController(IUtilisateurService utilisateurService) : Co
         }
     }
 
-    /// <summary>Valider le KYC</summary>
     [HttpPatch("{id:int}/valider-kyc")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> ValiderKyc(int id)
@@ -113,11 +105,6 @@ public class UtilisateursController(IUtilisateurService utilisateurService) : Co
         }
     }
 
-    // ════════════════════════════════════════════════════════════
-    //  ENDPOINTS PROFIL (utilisateur connecté)
-    // ════════════════════════════════════════════════════════════
-
-    /// <summary>Voir mon profil</summary>
     [HttpGet("profil")]
     [Authorize]
     public async Task<IActionResult> GetProfil()
@@ -133,7 +120,6 @@ public class UtilisateursController(IUtilisateurService utilisateurService) : Co
         }
     }
 
-    /// <summary>Modifier mon profil</summary>
     [HttpPut("profil")]
     [Authorize]
     public async Task<IActionResult> UpdateProfil([FromBody] ProfilUpdateDto dto)
@@ -148,8 +134,7 @@ public class UtilisateursController(IUtilisateurService utilisateurService) : Co
             return NotFound(new { error = ex.Message });
         }
     }
-
-    /// <summary>Changer mon mot de passe</summary>
+    
     [HttpPut("change-password")]
     [Authorize]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
@@ -165,7 +150,6 @@ public class UtilisateursController(IUtilisateurService utilisateurService) : Co
         }
     }
 
-    /// <summary>Demander réinitialisation mot de passe</summary>
     [HttpPost("reset-password")]
     [AllowAnonymous]
     public async Task<IActionResult> ResetPasswordRequest(
@@ -175,7 +159,6 @@ public class UtilisateursController(IUtilisateurService utilisateurService) : Co
         return Ok(new { message = "Si cet email existe, un lien a été envoyé." });
     }
 
-    /// <summary>Confirmer réinitialisation mot de passe</summary>
     [HttpPost("reset-password/confirm")]
     [AllowAnonymous]
     public async Task<IActionResult> ResetPasswordConfirm(

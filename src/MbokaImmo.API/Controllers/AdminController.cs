@@ -11,7 +11,7 @@ namespace MBOKA_IMMO.src.MbokaImmo.API.Controllers;
 [Produces("application/json")]
 public class AdminController(IAdminService adminService) : ControllerBase
 {
-    // ── GET /api/v1/admin/statistiques ────────────────────────────
+    
     [HttpGet("statistiques")]
     public async Task<IActionResult> GetStatistiques()
     {
@@ -19,7 +19,7 @@ public class AdminController(IAdminService adminService) : ControllerBase
         return Ok(stats);
     }
 
-    // ── GET /api/v1/admin/biens ───────────────────────────────────
+    
     [HttpGet("biens")]
     public async Task<IActionResult> GetAllBiens()
     {
@@ -27,7 +27,7 @@ public class AdminController(IAdminService adminService) : ControllerBase
         return Ok(biens);
     }
 
-    // ── GET /api/v1/admin/biens/en-attente ────────────────────────
+   
     [HttpGet("biens/en-attente")]
     public async Task<IActionResult> GetBiensEnAttente()
     {
@@ -35,7 +35,7 @@ public class AdminController(IAdminService adminService) : ControllerBase
         return Ok(biens);
     }
 
-    // ── PUT /api/v1/admin/biens/{id}/valider ──────────────────────
+   
     [HttpPut("biens/{id:int}/valider")]
     public async Task<IActionResult> ValiderBien(int id)
     {
@@ -50,7 +50,7 @@ public class AdminController(IAdminService adminService) : ControllerBase
         }
     }
 
-    // ── DELETE /api/v1/admin/biens/{id}/refuser ───────────────────
+    
     [HttpDelete("biens/{id:int}/refuser")]
     public async Task<IActionResult> RefuserBien(int id)
     {
@@ -65,7 +65,7 @@ public class AdminController(IAdminService adminService) : ControllerBase
         }
     }
 
-    // ── GET /api/v1/admin/artisans ────────────────────────────────
+    
     [HttpGet("artisans")]
     public async Task<IActionResult> GetAllArtisans()
     {
@@ -73,7 +73,6 @@ public class AdminController(IAdminService adminService) : ControllerBase
         return Ok(artisans);
     }
 
-    // ── PUT /api/v1/admin/artisans/{id}/valider-kyc ───────────────
     [HttpPut("artisans/{id:int}/valider-kyc")]
     public async Task<IActionResult> ValiderKyc(int id)
     {
@@ -88,15 +87,14 @@ public class AdminController(IAdminService adminService) : ControllerBase
         }
     }
 
-    // ── GET /api/v1/admin/interventions ───────────────────────────
-    [HttpGet("interventions")]
+    
     public async Task<IActionResult> GetAllInterventions()
     {
         var result = await adminService.GetAllInterventionsAsync();
         return Ok(result);
     }
 
-    // ── PUT /api/v1/admin/interventions/{id}/assigner ─────────────
+    
     [HttpPut("interventions/{id:int}/assigner")]
     public async Task<IActionResult> AssignerArtisan(
         int id, [FromBody] AssignerArtisanDto dto)
@@ -112,7 +110,7 @@ public class AdminController(IAdminService adminService) : ControllerBase
         }
     }
 
-    // ── PUT /api/v1/admin/interventions/{id}/devis ────────────────
+    
     [HttpPut("interventions/{id:int}/devis")]
     public async Task<IActionResult> ValiderDevis(
         int id, [FromBody] ValiderDevisDto dto)

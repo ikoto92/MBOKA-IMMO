@@ -16,11 +16,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Controllers
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// ── Swagger — version complète avec CustomSchemaIds
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new() { Title = "MBOKA IMMO API", Version = "v1" });
@@ -52,7 +50,6 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 
-// ── Services métier
 builder.Services.AddScoped<IBienService, BienService>();
 builder.Services.AddScoped<IBienRepository, BienRepository>();
 builder.Services.AddScoped<IStorageService, LocalStorageService>();
@@ -66,7 +63,6 @@ builder.Services.AddScoped<ICandidatureService, CandidatureService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IVirementService, VirementService>();
 
-// ── Upload fichiers
 builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 104857600;
@@ -80,7 +76,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-// ── JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -98,7 +93,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// ── CORS
 builder.Services.AddCors(options =>
     options.AddPolicy("MbokaPolicy", policy =>
         policy
@@ -116,7 +110,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// ── Seed Admin
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -138,7 +131,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// ── Dossier uploads
 var uploadsPath = Path.Combine(
     app.Environment.WebRootPath
         ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"),
@@ -147,7 +139,6 @@ var uploadsPath = Path.Combine(
 Directory.CreateDirectory(Path.Combine(uploadsPath, "biens"));
 Directory.CreateDirectory(Path.Combine(uploadsPath, "documents"));
 
-// ── Pipeline — Swagger HORS du if
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -156,10 +147,35 @@ app.UseSwaggerUI(c =>
 });
 
 app.UseCors("MbokaPolicy");
+
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    context.Response.Headers["Content-Security-Policy"] =
+        "default-src 'self'; " +
+        "script-src 'self'; " +
+        "style-src 'self' 'unsafe-inline'; " +
+        "img-src 'self' data: blob:; " +
+        "font-src 'self'; " +
+        "connect-src 'self'; " +
+        "frame-ancestors 'none';";
+    context.Response.Headers["Permissions-Policy"] =
+        "camera=(), microphone=(), geolocation=()";
+    await next();
+});
+
 app.UseStaticFiles();
+
+
 app.UseHttpsRedirection();
+
+
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();
