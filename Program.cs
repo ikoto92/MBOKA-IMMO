@@ -146,7 +146,6 @@ var uploadsPath = Path.Combine(
 );
 Directory.CreateDirectory(Path.Combine(uploadsPath, "biens"));
 Directory.CreateDirectory(Path.Combine(uploadsPath, "documents"));
-
 // ── Pipeline — Swagger HORS du if
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -161,5 +160,4 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();
