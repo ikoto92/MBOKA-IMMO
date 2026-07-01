@@ -19,7 +19,7 @@ public class VirementsController(IVirementService virementService) : ControllerB
             ?? throw new UnauthorizedAccessException("Propriétaire non authentifié.")
         );
 
-    /// <summary>Demander un virement</summary>
+
     [HttpPost]
     public async Task<IActionResult> DemanderVirement([FromBody] VirementCreateDto dto)
     {
@@ -35,7 +35,6 @@ public class VirementsController(IVirementService virementService) : ControllerB
         }
     }
 
-    /// <summary>Voir mes virements</summary>
     [HttpGet]
     public async Task<IActionResult> GetMesVirements()
     {

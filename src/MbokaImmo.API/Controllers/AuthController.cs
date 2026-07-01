@@ -29,7 +29,7 @@ public class AuthController : ControllerBase
         });
     }
 
-    /// <summary>Inscription d'un nouvel utilisateur</summary>
+    
     [HttpPost("register")]
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -52,7 +52,7 @@ public class AuthController : ControllerBase
         }
     }
 
-    /// <summary>Connexion et récupération du JWT</summary>
+    
     [HttpPost("login")]
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -70,7 +70,7 @@ public class AuthController : ControllerBase
         }
     }
 
-    /// <summary>Renouvelle l'access token via le refresh token (cookie HttpOnly)</summary>
+    
     [HttpPost("refresh")]
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -93,7 +93,7 @@ public class AuthController : ControllerBase
         }
     }
 
-    /// <summary>Déconnexion : révoque le refresh token et supprime le cookie</summary>
+    
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Logout()

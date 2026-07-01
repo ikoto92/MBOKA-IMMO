@@ -19,8 +19,7 @@ public class CandidaturesController(ICandidatureService candidatureService) : Co
         => int.Parse(User.FindFirstValue("proprietaireId")
             ?? throw new UnauthorizedAccessException());
 
-    // ── POST /api/v1/candidatures ─────────────────────────────────
-    /// <summary>Soumettre une candidature pour un bien</summary>
+   
     [HttpPost]
     [Authorize(Roles = "Locataire")]
     public async Task<IActionResult> Soumettre([FromBody] CandidatureCreateDto dto)
@@ -35,8 +34,7 @@ public class CandidaturesController(ICandidatureService candidatureService) : Co
         catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
     }
 
-    // ── GET /api/v1/candidatures/mes-candidatures ─────────────────
-    /// <summary>Voir mes candidatures (locataire)</summary>
+    
     [HttpGet("mes-candidatures")]
     [Authorize(Roles = "Locataire")]
     public async Task<IActionResult> GetMesCandidatures()
@@ -46,8 +44,7 @@ public class CandidaturesController(ICandidatureService candidatureService) : Co
         return Ok(result);
     }
 
-    // ── GET /api/v1/candidatures/bien/{idBien} ────────────────────
-    /// <summary>Voir les candidatures d'un bien (propriétaire)</summary>
+    
     [HttpGet("bien/{idBien:int}")]
     [Authorize(Roles = "Proprio")]
     public async Task<IActionResult> GetCandidaturesBien(int idBien)
@@ -62,8 +59,6 @@ public class CandidaturesController(ICandidatureService candidatureService) : Co
         catch (UnauthorizedAccessException) { return Forbid(); }
     }
 
-    // ── PUT /api/v1/candidatures/{id}/decision ────────────────────
-    /// <summary>Accepter ou refuser une candidature</summary>
     [HttpPut("{id:int}/decision")]
     [Authorize(Roles = "Proprio")]
     public async Task<IActionResult> Decider(
