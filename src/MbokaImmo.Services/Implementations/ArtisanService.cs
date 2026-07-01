@@ -7,8 +7,7 @@ namespace MBOKA_IMMO.src.MbokaImmo.Services.Implementations;
 
 public class ArtisanService(IArtisanRepository repo) : IArtisanService
 {
-    // ── Voir profil ──────────────────────────────────────────────
-    public async Task<ArtisanResponseDto> GetProfilAsync(int idUser)
+public async Task<ArtisanResponseDto> GetProfilAsync(int idUser)
     {
         var artisan = await repo.GetByUserIdAsync(idUser)
             ?? throw new KeyNotFoundException("Artisan introuvable.");
@@ -16,8 +15,7 @@ public class ArtisanService(IArtisanRepository repo) : IArtisanService
         return MapToDto(artisan);
     }
 
-    // ── Modifier profil ──────────────────────────────────────────
-    public async Task<ArtisanResponseDto> UpdateProfilAsync(int idUser, ArtisanUpdateDto dto)
+public async Task<ArtisanResponseDto> UpdateProfilAsync(int idUser, ArtisanUpdateDto dto)
     {
         var artisan = await repo.GetByUserIdAsync(idUser)
             ?? throw new KeyNotFoundException("Artisan introuvable.");
@@ -34,15 +32,13 @@ public class ArtisanService(IArtisanRepository repo) : IArtisanService
         return MapToDto(artisan);
     }
 
-    // ── Recevoir mes missions ────────────────────────────────────
-    public async Task<IEnumerable<MissionResponseDto>> GetMessMissionsAsync(int idArtisan)
+public async Task<IEnumerable<MissionResponseDto>> GetMessMissionsAsync(int idArtisan)
     {
         var interventions = await repo.GetInterventionsAsync(idArtisan);
         return interventions.Select(MapToMissionDto);
     }
 
-    // ── Soumettre un devis ───────────────────────────────────────
-    public async Task<MissionResponseDto> SoumettreDevisAsync(
+public async Task<MissionResponseDto> SoumettreDevisAsync(
         int idIntervention, int idArtisan, DevisSubmitDto dto)
     {
         var intervention = await repo.GetInterventionAsync(idIntervention, idArtisan)
@@ -61,8 +57,7 @@ public class ArtisanService(IArtisanRepository repo) : IArtisanService
         return MapToMissionDto(intervention);
     }
 
-    // ── Mettre à jour statut ─────────────────────────────────────
-    public async Task<MissionResponseDto> UpdateStatutAsync(
+public async Task<MissionResponseDto> UpdateStatutAsync(
         int idIntervention, int idArtisan, StatutUpdateDto dto)
     {
         var intervention = await repo.GetInterventionAsync(idIntervention, idArtisan)
@@ -71,8 +66,7 @@ public class ArtisanService(IArtisanRepository repo) : IArtisanService
         if (!Enum.TryParse<StatutInterventionEnum>(dto.Statut, true, out var statut))
             throw new ArgumentException($"Statut invalide : {dto.Statut}");
 
-        // Vérification des transitions de statut autorisées
-        var transitionsAutorisees = new Dictionary<StatutInterventionEnum, List<StatutInterventionEnum>>
+var transitionsAutorisees = new Dictionary<StatutInterventionEnum, List<StatutInterventionEnum>>
         {
             { StatutInterventionEnum.Valide,  [StatutInterventionEnum.Realise] },
             { StatutInterventionEnum.Realise, [StatutInterventionEnum.Facture] },
@@ -94,8 +88,7 @@ public class ArtisanService(IArtisanRepository repo) : IArtisanService
         return MapToMissionDto(intervention);
     }
 
-    // ── Envoyer une facture ──────────────────────────────────────
-    public async Task<MissionResponseDto> EnvoyerFactureAsync(
+public async Task<MissionResponseDto> EnvoyerFactureAsync(
         int idIntervention, int idArtisan, FactureSubmitDto dto)
     {
         var intervention = await repo.GetInterventionAsync(idIntervention, idArtisan)
@@ -114,8 +107,7 @@ public class ArtisanService(IArtisanRepository repo) : IArtisanService
         return MapToMissionDto(intervention);
     }
 
-    // ── Voir mes paiements ───────────────────────────────────────
-    public async Task<IEnumerable<PaiementArtisanResponseDto>> GetMesPaiementsAsync(int idArtisan)
+public async Task<IEnumerable<PaiementArtisanResponseDto>> GetMesPaiementsAsync(int idArtisan)
     {
         var paiements = await repo.GetPaiementsAsync(idArtisan);
         return paiements.Select(pi => new PaiementArtisanResponseDto
@@ -129,8 +121,7 @@ public class ArtisanService(IArtisanRepository repo) : IArtisanService
         });
     }
 
-    // ── Mappers ──────────────────────────────────────────────────
-    private static ArtisanResponseDto MapToDto(
+private static ArtisanResponseDto MapToDto(
         MBOKA_IMMO.src.MbokaImmo.Domain.Entities.Artisan a) => new()
         {
             IdArtisan = a.IdArtisan,

@@ -35,8 +35,7 @@ public class LocationService(AppDbContext context) : ILocationService
             Statut = StatutLocationEnum.Active,
         };
 
-        // Marquer le bien comme loué
-        bien.Statut = StatutBienEnum.Loue;
+bien.Statut = StatutBienEnum.Loue;
 
         context.Locations.Add(location);
         await context.SaveChangesAsync();

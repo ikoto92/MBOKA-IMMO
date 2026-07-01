@@ -11,7 +11,6 @@ public class BienService(
     IBienRepository bienRepo,
     IStorageService storage) : IBienService
 {
-    // ── Lister tous les biens ────────────────────────────────────
     public async Task<PagedResultDto<BienResponseDto>> GetAllAsync(
         int page, int pageSize, string? ville, string? type, decimal? loyerMax)
     {
@@ -25,21 +24,18 @@ public class BienService(
         };
     }
 
-    // ── Voir un bien ─────────────────────────────────────────────
     public async Task<BienResponseDto?> GetByIdAsync(int idBien)
     {
         var bien = await bienRepo.GetByIdAsync(idBien);
         return bien is null ? null : MapToDto(bien);
     }
 
-    // ── Mes biens ────────────────────────────────────────────────
     public async Task<List<BienResponseDto>> GetMesBiensAsync(int idProprietaire)
     {
         var biens = await bienRepo.GetByProprietaireAsync(idProprietaire);
         return biens.Select(MapToDto).ToList();
     }
 
-    // ── Publier un bien ──────────────────────────────────────────
     public async Task<BienResponseDto> CreateAsync(BienCreateDto dto, int idProprietaire)
     {
         if (!Enum.TryParse<TypeBienEnum>(dto.Type, true, out var type))
@@ -71,7 +67,6 @@ public class BienService(
         return MapToDto(bien);
     }
 
-    // ── Modifier un bien ─────────────────────────────────────────
     public async Task<BienResponseDto> UpdateAsync(
         int idBien, BienUpdateDto dto, int idProprietaire)
     {
@@ -105,7 +100,6 @@ public class BienService(
         return MapToDto(bien);
     }
 
-    // ── Supprimer un bien ────────────────────────────────────────
     public async Task DeleteAsync(int idBien, int idProprietaire)
     {
         var bien = await bienRepo.GetByIdAsync(idBien)
@@ -121,7 +115,6 @@ public class BienService(
         await bienRepo.SaveChangesAsync();
     }
 
-    // ── Upload photos ────────────────────────────────────────────
     public async Task<List<string>> UploadPhotosAsync(
         int idBien, List<IFormFile> photos, int idProprietaire)
     {
@@ -156,7 +149,6 @@ public class BienService(
         return urls;
     }
 
-    // ── Valider un bien (admin) ──────────────────────────────────
     public async Task<BienResponseDto> ValiderAsync(int idBien)
     {
         var bien = await bienRepo.GetByIdAsync(idBien)
@@ -169,7 +161,6 @@ public class BienService(
         return MapToDto(bien);
     }
 
-    // ── Mapper ───────────────────────────────────────────────────
     private static BienResponseDto MapToDto(Bien b) => new()
     {
         IdBien = b.IdBien,

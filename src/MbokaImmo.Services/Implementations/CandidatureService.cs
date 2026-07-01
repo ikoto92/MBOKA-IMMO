@@ -9,20 +9,17 @@ namespace MBOKA_IMMO.src.MbokaImmo.Services.Implementations;
 
 public class CandidatureService(AppDbContext context) : ICandidatureService
 {
-    // ── Soumettre une candidature ────────────────────────────────
-    public async Task<CandidatureResponseDto> SoumettreCandidatureAsync(
+public async Task<CandidatureResponseDto> SoumettreCandidatureAsync(
         CandidatureCreateDto dto, int idLocataire)
     {
-        // Vérifier que le bien existe et est disponible
-        var bien = await context.Biens
+var bien = await context.Biens
             .FirstOrDefaultAsync(b => b.IdBien == dto.IdBien && b.Valide)
             ?? throw new KeyNotFoundException("Bien introuvable ou non disponible.");
 
         if (bien.Statut != StatutBienEnum.Libre)
             throw new InvalidOperationException("Ce bien n'est plus disponible.");
 
-        // Vérifier qu'il n'a pas déjà candidaté
-        var dejaCandidate = await context.Candidatures
+var dejaCandidate = await context.Candidatures
             .AnyAsync(c => c.IdBien == dto.IdBien
                 && c.IdLocataire == idLocataire
                 && c.Statut != StatutCandidatureEnum.Refusee);
@@ -48,8 +45,7 @@ public class CandidatureService(AppDbContext context) : ICandidatureService
         return await MapToDto(candidature.IdCandidature);
     }
 
-    // ── Mes candidatures (locataire) ─────────────────────────────
-    public async Task<List<CandidatureResponseDto>> GetMesCandidaturesAsync(int idLocataire)
+public async Task<List<CandidatureResponseDto>> GetMesCandidaturesAsync(int idLocataire)
     {
         var candidatures = await context.Candidatures
             .Include(c => c.Bien)
@@ -61,8 +57,7 @@ public class CandidatureService(AppDbContext context) : ICandidatureService
         return candidatures.Select(MapToCandidatureDto).ToList();
     }
 
-    // ── Candidatures d'un bien (propriétaire) ────────────────────
-    public async Task<List<CandidatureResponseDto>> GetCandidaturesBienAsync(
+public async Task<List<CandidatureResponseDto>> GetCandidaturesBienAsync(
         int idBien, int idProprietaire)
     {
         var bien = await context.Biens
@@ -82,8 +77,7 @@ public class CandidatureService(AppDbContext context) : ICandidatureService
         return candidatures.Select(MapToCandidatureDto).ToList();
     }
 
-    // ── Accepter / Refuser une candidature ───────────────────────
-    public async Task<CandidatureResponseDto> DeciderCandidatureAsync(
+public async Task<CandidatureResponseDto> DeciderCandidatureAsync(
         int idCandidature, CandidatureDecisionDto dto, int idProprietaire)
     {
         var candidature = await context.Candidatures
@@ -102,11 +96,9 @@ public class CandidatureService(AppDbContext context) : ICandidatureService
         {
             candidature.Statut = StatutCandidatureEnum.Acceptee;
 
-            // Marquer le bien comme EnCours
-            candidature.Bien.Statut = StatutBienEnum.EnCours;
+candidature.Bien.Statut = StatutBienEnum.EnCours;
 
-            // Refuser toutes les autres candidatures pour ce bien
-            var autresCandidatures = await context.Candidatures
+var autresCandidatures = await context.Candidatures
                 .Where(c => c.IdBien == candidature.IdBien
                     && c.IdCandidature != idCandidature
                     && c.Statut == StatutCandidatureEnum.EnAttente)
@@ -124,8 +116,7 @@ public class CandidatureService(AppDbContext context) : ICandidatureService
         return MapToCandidatureDto(candidature);
     }
 
-    // ── Mapper ───────────────────────────────────────────────────
-    private async Task<CandidatureResponseDto> MapToDto(int idCandidature)
+private async Task<CandidatureResponseDto> MapToDto(int idCandidature)
     {
         var c = await context.Candidatures
             .Include(c => c.Bien)
